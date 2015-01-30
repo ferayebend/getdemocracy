@@ -5,7 +5,8 @@ from django.conf import settings
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
-from django.views.generic.simple import direct_to_template
+#from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 
 if settings.MAINTENANCE_MODE:
     urlpatterns = patterns(
@@ -28,7 +29,8 @@ else:
         url(r'^twitanaliz/$', 'twitanaliz.views.tweetAnalysis', name="twitanaliz"),
         url(r'^twitanaliz/dokum/$', 'twitanaliz.views.tweetResults', name="twitresults"),
         url(r'^gettweets/$', 'twitanaliz.views.getTweets', name="gettweets"),
-        url(r'^nedir/$', direct_to_template, {'template': 'about.html'}, name="readme"),
+        #url(r'^nedir/$', direct_to_template, {'template': 'about.html'}, name="readme"),
+        url(r'^nedir/$',TemplateView.as_view(template_name="about.html"), name="readme"),
 
         # url(r'^admin/', include(admin.site.urls)),
         url(r'^accounts/login/$', 'django.contrib.auth.views.login', name="login"),
