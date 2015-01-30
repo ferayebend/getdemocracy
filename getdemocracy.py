@@ -24,6 +24,8 @@ def main():
     temporaryList = []
 
     for info in parseData:
+	if info.string == None:
+	    continue
         if not info.string.isspace():
             temporaryList.append(info)
 
