@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # author: furiston
 
-import os, csv, datetime, glob, requests, logging as l
+import os, csv, datetime, glob, requests, time, logging as l
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "getDemocracy.settings")
 l.basicConfig(filename='gd.log', level=l.DEBUG)
@@ -51,7 +51,7 @@ def main():
 
     for data in dataToArray:
         if '<b>' in data:
-            city = data[36:-16]
+            city = data[33:-16]
 
         if 'href' in data:
             mvno = data[112:116]
@@ -89,14 +89,32 @@ def mv_workcount(idmv):
     resultset = []
 
     for link in all_links1:
-        page = requests.get(link + str(idmv))
+	connect = 0
+	while connect == 0:
+	      try:
+              	page = requests.get(link + str(idmv))
+                connect = 1
+              except requests.exceptions.ConnectionError:
+                connect = 0
+                print "could not connect: waiting..."
+                time.sleep(60)
+                print "trying again."
         html = BeautifulSoup(page.text, "lxml")
         for table in html.find_all('table'):
             if '2' in table.get('border'):
                 resultset.append(len(table.find_all('tr')) - 1)
 
     for link in all_links2:
-        page = requests.get(link + str(idmv))
+	connect = 0
+	while connect == 0:
+	      try:
+                page = requests.get(link + str(idmv))
+                connect = 1
+              except requests.exceptions.ConnectionError:
+                connect = 0
+                print "could not connect: waiting..."
+                time.sleep(60)
+                print "trying again."
         html = BeautifulSoup(page.text, "lxml")
         resultset.append(len(html.find_all('tr', valign="TOP")) / 2)
 
@@ -127,6 +145,7 @@ def mvCsvToDb(record_option):
                 party=mv.get('MVPARTY'),
                 city=mv.get('MVCITY')
             )
+            print "saving %s, %s, %s"%(mvrecord,mvrecord.party,mvrecord.city)
             mvrecord.save()
 
         mvdata = Mv_records(
